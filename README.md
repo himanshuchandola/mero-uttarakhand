@@ -2,7 +2,7 @@
 
 **उत्तराखंड देवभूमि** — Uttarakhandi folk that plays on the ride up the hill.
 
-![Mero Uttarakhand](docs/screenshot.jpg)
+<video src="https://raw.githubusercontent.com/himanshuchandola/mero-uttarakhand/master/public/bus-bg.mp4" controls muted loop width="100%"></video>
 
 ## What this is
 
