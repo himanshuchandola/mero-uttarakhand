@@ -24,7 +24,7 @@ export default function MeroPlayer() {
   const [tracks, setTracks] = useState<Track[]>([]), [index, setIndex] = useState(0), [playing, setPlaying] = useState(false), [time, setTime] = useState(0), [duration, setDuration] = useState(0), [volume, setVolume] = useState(72), [muted, setMuted] = useState(false), [ready, setReady] = useState(false), [error, setError] = useState<string>();
   const track = tracks[index];
   useEffect(() => { indexRef.current = index; }, [index]);
-  const sync = useCallback(() => { if (player.current?.getCurrentTime) { setTime(player.current.getCurrentTime()); setDuration(player.current.getDuration() || track?.duration || 0); } }, [track?.duration]);
+  const sync = useCallback(() => { if (player.current?.getCurrentTime) { setTime(player.current.getCurrentTime() ?? 0); setDuration(player.current.getDuration() || track?.duration || 0); } }, [track?.duration]);
   const choose = useCallback((next: number) => { if (!tracks.length) return; const target = (next + tracks.length) % tracks.length; setIndex(target); setTime(0); player.current?.loadVideoById(tracks[target].videoId); }, [tracks]);
   useEffect(() => { fetch("/api/playlist").then(async r => { const data = await r.json(); if (!r.ok) throw new Error(data.error); setTracks(data.tracks); }).catch(e => setError(e.message)); }, []);
   useEffect(() => { if (!tracks.length || player.current || !holder.current) return; const boot = () => { player.current = new window.YT.Player(holder.current!, { width: "320", height: "180", videoId: tracks[0].videoId, playerVars: { playsinline: 1, origin: window.location.origin }, events: { onReady: (e: any) => { e.target.setVolume(volume); setReady(true); }, onStateChange: (e: any) => { const state = window.YT.PlayerState; setPlaying(e.data === state.PLAYING); if (e.data === state.ENDED) choose(indexRef.current + 1); sync(); }, onError: () => setError("This YouTube video is not available to play.") } }); };
@@ -50,7 +50,7 @@ export default function MeroPlayer() {
       <h2 title={track.title}>{track.title}</h2>
       <p>{track.artist}</p>
       <div className="scrub" style={{ ["--p" as string]: `${progress}%` }}>
-        <input aria-label="Track progress" type="range" min="0" max={duration || 1} step="0.5" value={time} onChange={e => seek(+e.target.value)} />
+        <input aria-label="Track progress" type="range" min="0" max={duration || 1} step="0.5" value={time ?? 0} onChange={e => seek(+e.target.value)} />
         <span className="times"><b>{asTime(time)}</b> / {asTime(duration)}</span>
       </div>
     </div>
