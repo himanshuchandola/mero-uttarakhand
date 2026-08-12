@@ -58,7 +58,7 @@ export async function GET() {
     const items: YouTubeItem[] = []; let pageToken = "";
     do {
       const endpoint = new URL("https://www.googleapis.com/youtube/v3/playlistItems");
-      endpoint.search = new URLSearchParams({ part: "snippet", playlistId: id, maxResults: "50", key, ...(pageToken && { pageToken }) }).toString();
+      endpoint.search = new URLSearchParams({ part: "snippet", playlistId: id!, maxResults: "50", key, ...(pageToken && { pageToken }) }).toString();
       const response = await fetch(endpoint, { next: { revalidate: 300 } });
       if (!response.ok) throw new Error("YouTube rejected the playlist request.");
       const data = await response.json(); items.push(...data.items); pageToken = data.nextPageToken || "";
