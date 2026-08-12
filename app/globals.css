@@ -1,0 +1,187 @@
+:root {
+  --ink: #fff4e6;
+  --ink-soft: rgba(255, 244, 230, .66);
+  --dusk: #2a1a12;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+* { box-sizing: border-box; }
+html { background: var(--dusk); }
+body { margin: 0; color: var(--ink); font-family: var(--font-sans), system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid rgba(255, 244, 230, .85); outline-offset: 3px; }
+
+/* ---------- stage ---------- */
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  padding: 0 clamp(1rem, 3.4vw, 3.2rem) clamp(3.4rem, 10vh, 6.5rem);
+  overflow: hidden;
+}
+.backdrop { position: absolute; inset: 0; z-index: -1; }
+.backdrop > * { position: absolute; inset: 0; }
+.backdrop-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 44%;
+  background: var(--dusk);
+  filter: saturate(1.1) contrast(1.03);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop-video { display: none; }
+  .backdrop { background: var(--dusk) url("/bg.png") center 44% / cover no-repeat; }
+}
+.backdrop-scrim {
+  background:
+    linear-gradient(180deg, rgba(20, 10, 6, .6) 0%, rgba(22, 12, 7, .26) 30%, transparent 54%),
+    linear-gradient(0deg, rgba(28, 13, 7, .7) 0%, rgba(28, 13, 7, .2) 26%, transparent 46%),
+    radial-gradient(140% 90% at 50% 50%, transparent 42%, rgba(22, 11, 6, .34));
+}
+.backdrop-grain { background-image: var(--grain); opacity: .07; mix-blend-mode: overlay; }
+
+/* ---------- top bar ---------- */
+.topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: clamp(58px, 7vh, 78px);
+  flex: none;
+}
+.topbar-left { display: flex; align-items: center; gap: .9rem; }
+.clock {
+  min-width: 7.6ch;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: .78rem;
+  letter-spacing: .02em;
+  text-shadow: 0 1px 10px rgba(20, 10, 6, .6);
+}
+.presence {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: .42rem;
+  padding: .38rem .85rem;
+  color: var(--ink-soft);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: .78rem;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  background: rgba(30, 16, 10, .3);
+  border: 1px solid rgba(255, 236, 214, .18);
+  border-radius: 999px;
+  backdrop-filter: blur(14px);
+  text-shadow: 0 1px 10px rgba(20, 10, 6, .6);
+}
+.presence b { color: var(--ink); font-weight: 500; }
+.presence-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 0 rgba(74, 222, 128, .6);
+  animation: presence-pulse 2.2s infinite;
+}
+@keyframes presence-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, .55); }
+  70% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .48rem;
+  padding: .38rem .8rem .38rem .42rem;
+  color: var(--ink);
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: -.01em;
+  text-decoration: none;
+  background: rgba(30, 16, 10, .3);
+  border: 1px solid rgba(255, 236, 214, .18);
+  border-radius: 999px;
+  backdrop-filter: blur(14px);
+  transition: background .2s ease, border-color .2s ease;
+}
+.chip:hover { background: rgba(48, 26, 16, .46); border-color: rgba(255, 236, 214, .34); }
+.chip img { width: 21px; height: 21px; border-radius: 50%; object-fit: contain; }
+.chip-arrow { font-size: .68rem; opacity: .55; }
+
+.icon-row { display: flex; align-items: center; gap: .55rem; }
+.chip svg { display: block; border-radius: 50%; }
+
+/* ---------- player + hero placement ---------- */
+.player-slot {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(1.1rem, 3.4vh, 2rem);
+  transform: translateX(-50%);
+  z-index: 5;
+  width: min(92vw, 580px);
+}
+.player-slot::before {
+  content: "";
+  position: absolute;
+  left: -12%;
+  right: -12%;
+  bottom: -1.5rem;
+  height: 220%;
+  background: radial-gradient(60% 100% at 50% 100%, rgba(16, 8, 4, .55), transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+.hero-title { margin: clamp(2.2rem, 9vh, 6rem) 0 0; flex: none; text-align: center; padding: 0 .5rem; }
+.hero-title h1 {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  /* Sized to the longer combined line now that both words sit on one row —
+     roughly half the old two-line scale so it still clears the viewport edge
+     on a phone instead of wrapping mid-word. */
+  font-size: clamp(2.1rem, 9.2vw, 5.6rem);
+  line-height: 1.05;
+  letter-spacing: -.005em;
+  text-shadow: 0 2px 3px rgba(38, 14, 6, .28), 0 16px 50px rgba(26, 10, 4, .55);
+  white-space: nowrap;
+}
+.hero-subtitle {
+  margin: clamp(.6rem, 2vh, 1.1rem) 0 0;
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: clamp(1.15rem, 4.4vw, 2.15rem);
+  color: #ffe9cf;
+  text-shadow: 0 2px 3px rgba(38, 14, 6, .28), 0 10px 30px rgba(26, 10, 4, .5);
+}
+
+@media (max-width: 700px) {
+  .backdrop-video { object-position: 52% 68%; }
+}
+
+@media (max-width: 480px) {
+  /* The presence pill is wide with the full Devanagari line — true top-center
+     absolute placement would overlap the clock or the icon row at this width,
+     so it drops to its own centered row underneath instead. */
+  .topbar { flex-wrap: wrap; height: auto; row-gap: .5rem; padding: .8rem 0; gap: .5rem; }
+  .topbar-left { gap: .6rem; }
+  .presence { position: static; order: 3; transform: none; width: 100%; justify-content: center; font-size: .72rem; }
+  .icon-row { gap: .4rem; }
+  .chip { padding: .38rem; }
+  .chip-label, .chip-arrow { display: none; }
+  .chip img, .chip svg { width: 22px; height: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
